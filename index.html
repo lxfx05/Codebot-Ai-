@@ -150,10 +150,8 @@
         const result = await callAI(code, lang, 'explain', out); 
 
         if (typeof result === 'string') {
-            // Caso di errore generico dal backend
             out.innerHTML = `<span class="error">${result}</span>`;
         } else {
-            // Successo: mostra solo la risposta
             out.innerHTML = `<span class="success">Risposta del Sistema:</span>\n\n${result.response}`;
         }
     }
@@ -170,7 +168,6 @@
         const result = await callAI(code, lang, 'fix', out); 
 
         if (typeof result === 'string') {
-            // Caso di errore generico dal backend
             out.innerHTML = `<span class="error">${result}</span>`;
         } else {
             let fixedCode = null;
