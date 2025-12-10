@@ -1,4 +1,4 @@
-const VERCEL_ENDPOINT = 'TUA_URL_VERCEL/api/proxy'; 
+const VERCEL_ENDPOINT = 'https://codebot-ai.vercel.app/api/proxy'; 
 
 async function callAI(code, lang, action, outElement) {
     
