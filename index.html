@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codebot</title>
+  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+  <style>
+:root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --fg: #e0e0e0;
+      --accent: #646cff;
+      --error: #ff6b6b;
+      --success: #4caf50;
+      --warning: #FFA500;
+}
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fira Code', monospace, sans-serif;}
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      padding: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+}
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #333;
+}
+    h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, var(--accent), #4ade80);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+}
+.subtitle {
+      color: #aaa;
+      font-size: 1rem;
+}
+.container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+}
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      background: var(--card);
+      color: white;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      resize: vertical;
+      font-size: 14px;
+}
+    select {
+      padding: 8px;
+      background: var(--card);
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+}
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 4px;
+}
+    button:hover { opacity: 0.9;}
+.button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+}
+.ai-button {
+      background: #9c27b0;
+}
+.ai-button:hover { opacity: 0.9;}
+    #output {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 80px;
+}
+.success { color: var(--success);}
+.error { color: var(--error);}
+.warning { color: var(--warning);}
+.loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: var(--accent);
+        animation: spin 1s ease-in-out infinite;
+}
+    @keyframes spin {
+        to { transform: rotate(360deg);}
+}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Codebot</h1>
+    <p class="subtitle">Offline Code Helper • Zero AI • 100% in Browser</p>
+  </header>
+
+  <div class="container">
+    <select id="lang">
+      <option value="js">JavaScript</option>
+      <option value="jsx">React (JSX)</option>
+      <option value="py">Python</option>
+      <option value="java">Java</option>
+      <option value="cpp">C++</option>
+      <option value="go">Go</option>
+    </select>
+    <textarea id="code" placeholder="Paste your code here..."></textarea>
+
+    <div class="button-group">
+      <button class="ai-button" onclick="explainCode()">Explain Code</button>
+      <button class="ai-button" onclick="fixCode()">Check & Fix</button>
+    </div>
+
+    <div id="output">Results will appear here.</div>
+  </div>
+
+  <script>
+    const DYNAMIC_PROXY_URL = 'https://codebot-ai.vercel.app/api/proxyGemini'; 
+    
+    async function callDynamicProxy(code, lang, action, outElement) {
+        const payload = { code: code, lang: lang, action: action }; 
+        
+        try {
+            const response = await fetch(DYNAMIC_PROXY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Proxy Error (${response.status}): ${errorData.error || 'Unknown proxy error'}`);
+            }
+
+            const data = await response.json();
+            return { response: data.response, source: data.source }; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async function callAI(code, lang, action, outElement) {
+        outElement.innerHTML = `<span class="warning">Backend is loading... (via Dynamic Proxy)</span> <div class="loading"></div>`;
+        try {
+            return await callDynamicProxy(code, lang, action, outElement);
+        } catch (proxyError) {
+            console.error("Dynamic Proxy failed:", proxyError.message);
+            return `❌ Server Error. Please check Vercel Logs. Error: ${proxyError.message}`;
+        }
+    }
+
+    async function explainCode() {
+        const code = document.getElementById('code').value.trim();
+        const lang = document.getElementById('lang').value;
+        const out = document.getElementById('output');
+
+        if (!code) {
+            out.innerHTML = '<span class="error">⚠️ Paste code first.</span>';
+            return;
+        }
+        const result = await callAI(code, lang, 'explain', out); 
+
+        if (typeof result === 'string' && result.startsWith('❌')) {
+            out.innerHTML = `<span class="error">${result}</span>`;
+        } else {
+            out.innerHTML = `<span class="success">${result.source} Explanation:</span>\n\n${result.response}`;
+        }
+    }
+
+    async function fixCode() {
+        const code = document.getElementById('code').value.trim();
+        const lang = document.getElementById('lang').value;
+        const out = document.getElementById('output');
+
+        if (!code) {
+            out.innerHTML = '<span class="error">⚠️ Paste code first.</span>';
+            return;
+        }
+        const result = await callAI(code, lang, 'fix', out); 
+
+        if (typeof result === 'string' && result.startsWith('❌')) {
+            out.innerHTML = `<span class="error">${result}</span>`;
+        } else {
+            let fixedCode = null;
+            let displayResponse = result.response;
+
+            const codeBlockRegex = /```(?:\w+\n)?([\s\S]*?)```/;
+            const match = result.response.match(codeBlockRegex);
+            if (match) {
+                fixedCode = match[1].trim();
+                if (fixedCode === code && result.response.includes("Code seems good")) {
+                    displayResponse = "Code seems good 👍😊";
+                    out.innerHTML = `<span class="success">${displayResponse}</span>`;
+                } else {
+                    displayResponse = result.response.replace(codeBlockRegex, '').trim();
+                    let outputHTML = `<span class="success">${result.source} Response:</span>\n\n${displayResponse}`;
+                    outputHTML += `\n\n----------\n\n<span class="success">Suggested Fix:</span>\n\n\`\`\`${lang}\n${fixedCode}\n\`\`\`\n\n<button onclick="applyFix()">Apply This Fix</button>`;
+                    out.innerHTML = outputHTML;
+                }
+            } else {
+                if (result.response.includes("Code seems good")) {
+                    out.innerHTML = `<span class="success">${result.response}</span>`;
+                } else {
+                    out.innerHTML = `<span class="success">${result.source} Response:</span>\n\n${result.response}`;
+                }
+            }
+        }
+    }
+
+    function applyFix() {
+        const out = document.getElementById('output');
+        const textContent = out.textContent;
+        const codeBlockRegex = /```(?:\w+\n)?([\s\S]*?)```/;
+        const match = textContent.match(codeBlockRegex);
+        if (match) {
+            const newCode = match[1].trim();
+            document.getElementById('code').value = newCode;
+            out.innerHTML += `\n\n<span class="success">✅ Code updated in the editor.</span>`;
+        } else {
+            out.innerHTML += `\n\n<span class="error">❌ No fix available to apply.</span>`;
+        }
+    }
+  </script>
+</body>
+</html>
