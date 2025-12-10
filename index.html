@@ -113,7 +113,7 @@
 <body>
   <header>
     <h1>Codebot</h1>
-    <p class="subtitle">No AI, just backend form optionibrary/p>
+    <p class="subtitle">Direct API Mode</p>
   </header>
 
   <div class="container">
@@ -149,10 +149,12 @@
         }
         const result = await callAI(code, lang, 'explain', out); 
 
-        if (typeof result === 'string' && result.startsWith('Backend')) {
+        if (typeof result === 'string') {
+            // Caso di errore generico dal backend
             out.innerHTML = `<span class="error">${result}</span>`;
         } else {
-            out.innerHTML = `<span class="success">${result.source} Explanation:</span>\n\n${result.response}`;
+            // Successo: mostra solo la risposta
+            out.innerHTML = `<span class="success">Risposta del Sistema:</span>\n\n${result.response}`;
         }
     }
 
@@ -167,7 +169,8 @@
         }
         const result = await callAI(code, lang, 'fix', out); 
 
-        if (typeof result === 'string' && result.startsWith('Backend')) {
+        if (typeof result === 'string') {
+            // Caso di errore generico dal backend
             out.innerHTML = `<span class="error">${result}</span>`;
         } else {
             let fixedCode = null;
@@ -182,7 +185,7 @@
                     out.innerHTML = `<span class="success">${displayResponse}</span>`;
                 } else {
                     displayResponse = result.response.replace(codeBlockRegex, '').trim();
-                    let outputHTML = `<span class="success">${result.source} Response:</span>\n\n${displayResponse}`;
+                    let outputHTML = `<span class="success">Risposta del Sistema:</span>\n\n${displayResponse}`;
                     outputHTML += `\n\n----------\n\n<span class="success">Suggested Fix:</span>\n\n\`\`\`${lang}\n${fixedCode}\n\`\`\`\n\n<button onclick="applyFix()">Apply This Fix</button>`;
                     out.innerHTML = outputHTML;
                 }
@@ -190,7 +193,7 @@
                 if (result.response.includes("Code seems good")) {
                     out.innerHTML = `<span class="success">${result.response}</span>`;
                 } else {
-                    out.innerHTML = `<span class="success">${result.source} Response:</span>\n\n${result.response}`;
+                    out.innerHTML = `<span class="success">Risposta del Sistema:</span>\n\n${result.response}`;
                 }
             }
         }
@@ -211,4 +214,4 @@
     }
   </script>
 </body>
-Fallback
+</html>
