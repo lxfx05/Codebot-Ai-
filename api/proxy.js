@@ -1,19 +1,9 @@
-const OpenAI = require('openai');
-const Groq = require('groq-sdk');
 const fetch = require('node-fetch');
 
-const GROQ_KEY = process.env.GROQ_KEY;
-const OPENAI_KEY = process.env.OPENAI_KEY;
 const GEMINI_KEY = process.env.GEMINI_KEY;
 
 const providers = [];
 
-if (GROQ_KEY) {
-    providers.push({ name: 'Groq', type: 'OpenAI_Compatible', key: GROQ_KEY, model: 'llama3-70b-8192' });
-}
-if (OPENAI_KEY) {
-    providers.push({ name: 'OpenAI', type: 'OpenAI_Compatible', key: OPENAI_KEY, model: 'gpt-3.5-turbo' });
-}
 if (GEMINI_KEY) {
     providers.push({ name: 'Gemini', type: 'Gemini', key: GEMINI_KEY, model: 'gemini-2.5-flash' });
 }
@@ -44,17 +34,7 @@ module.exports = async (req, res) => {
         try {
             let text = '';
 
-            if (provider.type === 'OpenAI_Compatible') {
-                const client = provider.name === 'Groq' ? new Groq({ apiKey: provider.key }) : new OpenAI({ apiKey: provider.key });
-                
-                const chatCompletion = await client.chat.completions.create({
-                    messages: [{ role: "user", content: promptTemplate }],
-                    model: provider.model,
-                    max_tokens: 1024
-                });
-                text = chatCompletion.choices[0]?.message?.content || '';
-
-            } else if (provider.type === 'Gemini') {
+            if (provider.type === 'Gemini') {
                 const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${provider.key}`;
                 
                 const geminiResponse = await fetch(geminiUrl, {
