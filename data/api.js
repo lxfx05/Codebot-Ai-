@@ -16,7 +16,7 @@ if (OPENAI_KEY) {
     providers.push({ 
         name: 'OpenAI', 
         key: OPENAI_KEY, 
-        url: 'https://api.openai.com/v1/chat/completions', 
+        url: 'https://api.openai.com/openai/v1/chat/completions', 
         model: 'gpt-3.5-turbo' 
     });
 }
@@ -25,8 +25,6 @@ async function callAI(code, lang, action, outElement) {
     const promptTemplate = `You are a programming assistant. If action is 'explain', provide a brief explanation. If action is 'fix', analyze and provide the corrected code. Focus on the ${lang.toUpperCase()} code:\n\n\`\`\`${lang}\n${code}\n\`\`\``;
 
     outElement.innerHTML = `<span class="warning">Processing...</span> <div class="loading"></div>`;
-
-    let lastError = null;
 
     for (const provider of providers) {
         try {
@@ -48,20 +46,22 @@ async function callAI(code, lang, action, outElement) {
             const data = await response.json();
 
             if (!response.ok || data.error) {
-                const errorMessage = data.error?.message || data.statusText || 'Unknown failure.';
-                throw new Error(errorMessage);
+
+                throw new Error("Backend service failed"); 
             }
 
             const text = data.choices[0]?.message?.content;
 
             if (text && text.trim().length > 0) {
-                return { response: text, source: provider.name };
+
+                return { response: text }; 
             }
 
         } catch (error) {
-            lastError = `${provider.name}: ${error.message}`;
+
         }
     }
     
-    return `Backend now is unreachable, so try again later... Last error: ${lastError}`;
+
+    return `The backend is receiving too many requests at the moment, please try again later.`;
 }
