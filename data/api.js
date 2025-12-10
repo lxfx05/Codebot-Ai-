@@ -16,7 +16,7 @@ if (OPENAI_KEY) {
     providers.push({ 
         name: 'OpenAI', 
         key: OPENAI_KEY, 
-        url: 'https://api.openai.com/openai/v1/chat/completions', 
+        url: 'https://api.openai.com/v1/chat/completions', 
         model: 'gpt-3.5-turbo' 
     });
 }
@@ -46,22 +46,18 @@ async function callAI(code, lang, action, outElement) {
             const data = await response.json();
 
             if (!response.ok || data.error) {
-
                 throw new Error("Backend service failed"); 
             }
 
             const text = data.choices[0]?.message?.content;
 
             if (text && text.trim().length > 0) {
-
                 return { response: text }; 
             }
 
         } catch (error) {
-
         }
     }
     
-
-    return `The backend is receiving too many requests at the moment, please try again later.`;
+    return `Backend now is unreachable. Please try again later.`;
 }
