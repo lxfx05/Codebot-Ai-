@@ -1,5 +1,5 @@
-const GROQ_KEY = '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';
-const OPENAI_KEY = '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';
+const GROQ_KEY = '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';
+const OPENAI_KEY = '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';
 
 const providers = [];
 
