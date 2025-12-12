@@ -2,7 +2,7 @@
   "name": "codebot-gemini-proxy",
   "version": "1.0.0",
   "description": "Proxy serverless for Gemini AI calls.",
-  "main": "api/proxy.js",
+  "main": "data/proxy.js",
   "dependencies": {
     "node-fetch": "^2.6.7" 
   }
