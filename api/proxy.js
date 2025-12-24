@@ -9,41 +9,51 @@ export default async function handler(req, res) {
     const GROQ_KEY = process.env.GROQ_KEY;
 
     if (!GROQ_KEY) {
-        return res.status(500).json({ error: "Configurazione mancante: GROQ_KEY non impostata su Vercel." });
+        return res.status(500).json({ error: "Manca la GROQ_KEY su Vercel." });
     }
 
-    try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: "llama-3.3-70b-specdec",
-                messages: [
-                    { 
-                        role: "system", 
-                        content: `Sei un assistente programmatore esperto. Lingua: Italiano. Azione richiesta: ${action}.` 
-                    },
-                    { 
-                        role: "user", 
-                        content: `Linguaggio: ${lang}\nCodice:\n${code}` 
-                    }
-                ],
-                temperature: 0.3
-            })
-        });
+    // Lista modelli aggiornata al 2025
+    // Proviamo il versatile 3.3, il 3.1 stabile o il nuovo Llama 4 se disponibile
+    const models = [
+        "llama-3.3-70b-versatile", 
+        "llama-3.1-8b-instant"
+    ];
 
-        const data = await response.json();
+    let lastError = "";
 
-        if (data.error) {
-            return res.status(response.status).json({ error: "Errore Groq", details: data.error.message });
+    for (const modelId of models) {
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${GROQ_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: modelId,
+                    messages: [
+                        { role: "system", content: "Sei un esperto programmatore. Rispondi in modo conciso." },
+                        { role: "user", content: `Azione: ${action}\nLinguaggio: ${lang}\nCodice:\n${code}` }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                return res.status(200).json({ 
+                    response: data.choices[0].message.content,
+                    info: `Modello usato: ${modelId}`
+                });
+            } else {
+                lastError = data.error?.message || "Errore sconosciuto";
+                if (lastError.includes("decommissioned") || lastError.includes("not found")) continue;
+                break; // Se l'errore è altro (es. Key errata), fermati
+            }
+        } catch (err) {
+            lastError = err.message;
         }
-
-        res.status(200).json({ response: data.choices[0].message.content });
-
-    } catch (err) {
-        res.status(500).json({ error: "Errore interno del server", details: err.message });
     }
+
+    res.status(500).json({ error: "Errore Groq", details: lastError });
 }
