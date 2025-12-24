@@ -7,52 +7,53 @@ export default async function handler(req, res) {
 
     const { code, lang, action } = req.body || {};
     
-    // Lista delle chiavi caricate da Vercel
+    // Recupero le chiavi dalle variabili d'ambiente di Vercel
     const keys = [
         process.env.KEY1,
         process.env.KEY2,
         process.env.KEY3
-    ].filter(k => k); // Rimuove chiavi vuote o non impostate
+    ].filter(k => k && k.trim() !== "");
 
     if (keys.length === 0) {
-        return res.status(500).json({ error: "Nessuna chiave API configurata su Vercel." });
+        return res.status(500).json({ error: "Nessuna chiave API configurata su Vercel (KEY_1, KEY_2, KEY_3)." });
     }
 
     let lastError = "";
 
-    // Ciclo per provare ogni chiave
     for (let i = 0; i < keys.length; i++) {
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys[i]}`, {
+            // Usiamo v1 invece di v1beta per maggiore stabilità
+            const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${keys[i]}`;
+            
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: `Azione: ${action}. Linguaggio: ${lang}. Codice:\n${code}` }] }]
+                    contents: [{
+                        parts: [{ text: `Agisci come assistente programmatore. Azione: ${action}. Linguaggio: ${lang}. Codice:\n${code}` }]
+                    }]
                 })
             });
 
             const data = await response.json();
 
-            if (response.ok) {
-                // Se la chiamata ha successo, restituisce il risultato e interrompe il ciclo
+            if (response.ok && data.candidates && data.candidates[0].content) {
                 return res.status(200).json({ 
                     response: data.candidates[0].content.parts[0].text,
-                    keyUsed: `Chiave ${i + 1}` 
+                    info: `Successo con Chiave ${i + 1}`
                 });
             } else {
-                lastError = data.error?.message || "Errore sconosciuto";
-                console.warn(`Chiave ${i + 1} fallita: ${lastError}`);
+                lastError = data.error?.message || "Risposta non valida dal modello";
+                console.warn(`Tentativo ${i + 1} fallito: ${lastError}`);
             }
         } catch (err) {
             lastError = err.message;
-            console.error(`Errore tecnico con Chiave ${i + 1}`);
+            console.error(`Errore tecnico chiave ${i + 1}:`, err);
         }
     }
 
-    // Se arriviamo qui, tutte le chiavi hanno fallito
     res.status(500).json({ 
-        error: "Tutte le chiavi API hanno fallito.", 
+        error: "Non è stato possibile ottenere una risposta dalle API di Google.", 
         details: lastError 
     });
 }
-
