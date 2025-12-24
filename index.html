@@ -119,26 +119,26 @@
 
   <header>
     <h1>SYSTEM_CORE V3</h1>
-    <p class="subtitle">BACKEND_ENGINE • STATICAL_ANALYSIS_ACTIVE</p>
+    <p class="subtitle">Code-Fixer</p>
   </header>
 
   <div class="container">
     <select id="lang">
-      <option value="javascript">JAVASCRIPT_RUNTIME</option>
-      <option value="python">PYTHON_INTERPRETER</option>
-      <option value="java">JAVA_VIRTUAL_MACHINE</option>
-      <option value="c">C_COMPILER</option>
-      <option value="cpp">CPP_STDLIB</option>
+      <option value="javascript">Java</option>
+      <option value="python">Python</option>
+      <option value="java">Java</option>
+      <option value="c">C</option>
+      <option value="cpp">C++</option>
     </select>
     
     <textarea id="code" placeholder="[WAITING_FOR_INPUT] Incolla il codice sorgente qui..."></textarea>
 
     <div class="button-group">
-      <button onclick="processRequest('Explain')">RUN_EXPLAIN</button>
-      <button onclick="processRequest('Fix')">RUN_FIX_OPTIMIZE</button>
+      <button onclick="processRequest('Explain')">Load Backend</button>
+      <button onclick="processRequest('Fix')">Load Backend</button>
     </div>
 
-    <div id="output">MODULO_PRONTO: In attesa di istruzioni...</div>
+    <div id="output">Backend Caricato: In attesa di istruzioni...</div>
   </div>
 
   <script>
