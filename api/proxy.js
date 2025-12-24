@@ -6,61 +6,52 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     const { code, lang, action } = req.body || {};
-    const GROQ_KEY = process.env.GROQ_KEY;
+    
+    // Lista delle chiavi caricate da Vercel
+    const keys = [
+        process.env.GROQ_KEY_1,
+        process.env.GROQ_KEY_2,
+        process.env.GROQ_KEY_3
+    ].filter(k => k);
 
-    if (!GROQ_KEY) {
-        return res.status(500).json({ error: "System Error: Missing Backend Configuration." });
+    if (keys.length === 0) {
+        return res.status(500).json({ error: "[SYSTEM_ERROR] No Keys Configured" });
     }
 
-    const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
     let lastError = "";
 
-    for (const modelId of models) {
+    // Ciclo di rotazione chiavi
+    for (let i = 0; i < keys.length; i++) {
         try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${GROQ_KEY}`,
+                    'Authorization': `Bearer ${keys[i]}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: modelId,
+                    model: "llama-3.3-70b-versatile",
                     messages: [
-                        { 
-                            role: "system", 
-                            content: `Agisci come un motore di analisi statica del codice integrato nel backend. 
-                            NON salutare. NON dire 'Ecco il codice'. NON menzionare di essere un'IA o un modello linguistico. 
-                            Fornisci solo l'analisi tecnica o il codice corretto. 
-                            Usa un tono puramente tecnico e professionale.` 
-                        },
-                        { role: "user", content: `ENTRY_POINT: ${action}\nTARGET_LANG: ${lang}\nSOURCE_CODE:\n${code}` }
+                        { role: "system", content: "Agisci come Backend Engine. Analisi tecnica pura, no AI talk." },
+                        { role: "user", content: `ACTION: ${action}\nLANG: ${lang}\nCODE:\n${code}` }
                     ],
-                    temperature: 0.2 // Più basso per risposte più precise e meno "chiacchierone"
+                    temperature: 0.1
                 })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                let cleanResponse = data.choices[0].message.content;
-                
-                // Rimuove eventuali scorie residue che citano l'IA (sicurezza extra)
-                cleanResponse = cleanResponse.replace(/come un modello di linguaggio/gi, "")
-                                             .replace(/in quanto IA/gi, "")
-                                             .replace(/Ecco la spiegazione/gi, "");
-
                 return res.status(200).json({ 
-                    response: cleanResponse 
+                    response: data.choices[0].message.content 
                 });
             } else {
-                lastError = data.error?.message || "Unknown internal error";
-                if (lastError.includes("decommissioned") || lastError.includes("not found")) continue;
-                break;
+                lastError = data.error?.message || "Key Failure";
+                console.warn(`Chiave ${i+1} fallita, provo la prossima...`);
             }
         } catch (err) {
             lastError = err.message;
         }
     }
 
-    res.status(500).json({ error: "Backend Analysis Failed", details: lastError });
-}
+    res.status(500).json({ error: "[BACKEND_EXHAUSTED]", details: lastError Vercel
