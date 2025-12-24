@@ -6,12 +6,10 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     const { code, lang, action } = req.body || {};
-    
-    // Recupera la chiave Groq da Vercel
     const GROQ_KEY = process.env.GROQ_KEY;
 
     if (!GROQ_KEY) {
-        return res.status(500).json({ error: "Manca la GROQ_KEY su Vercel." });
+        return res.status(500).json({ error: "Configurazione mancante: GROQ_KEY non impostata su Vercel." });
     }
 
     try {
@@ -22,25 +20,30 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: "llama-3.3-70b-specdec", // Il modello più veloce e potente di Groq
+                model: "llama-3.3-70b-specdec",
                 messages: [
-                    { role: "system", content: `Sei un esperto programmatore ${lang}.` },
-                    { role: "user", content: `Azione: ${action}\nCodice:\n${code}` }
+                    { 
+                        role: "system", 
+                        content: `Sei un assistente programmatore esperto. Lingua: Italiano. Azione richiesta: ${action}.` 
+                    },
+                    { 
+                        role: "user", 
+                        content: `Linguaggio: ${lang}\nCodice:\n${code}` 
+                    }
                 ],
-                temperature: 0.5
+                temperature: 0.3
             })
         });
 
         const data = await response.json();
 
         if (data.error) {
-            return res.status(401).json({ error: "Errore Groq", details: data.error.message });
+            return res.status(response.status).json({ error: "Errore Groq", details: data.error.message });
         }
 
-        const aiText = data.choices[0]?.message?.content || "Nessuna risposta.";
-        res.status(200).json({ response: aiText });
+        res.status(200).json({ response: data.choices[0].message.content });
 
     } catch (err) {
-        res.status(500).json({ error: "Errore di rete", details: err.message });
+        res.status(500).json({ error: "Errore interno del server", details: err.message });
     }
 }
