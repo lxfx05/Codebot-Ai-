@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Codebot AI</title>
-  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+  <title>Codebot Backend System</title>
+  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
   <style>
     :root {
       --bg: #121212;
@@ -12,7 +12,7 @@
       --fg: #e0e0e0;
       --accent: #646cff;
       --error: #ff6b6b;
-      --success: #4caf50;
+      --success: #4ade80;
       --warning: #FFA500;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Fira Code', monospace, sans-serif;}
@@ -31,15 +31,16 @@
     }
     h1 {
       font-size: 2.2rem;
-      background: linear-gradient(90deg, var(--accent), #4ade80);
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       margin-bottom: 8px;
     }
     .subtitle {
-      color: #aaa;
-      font-size: 1rem;
+      color: #888;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
     }
     .container {
       display: flex;
@@ -56,40 +57,46 @@
       padding: 16px;
       resize: vertical;
       font-size: 14px;
+      outline: none;
     }
+    textarea:focus { border-color: var(--accent); }
     select {
       padding: 8px;
       background: var(--card);
       color: white;
       border: 1px solid #444;
       border-radius: 4px;
+      cursor: pointer;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     button {
-      background: var(--accent);
+      background: #333;
       color: white;
-      border: none;
-      padding: 10px 16px;
+      border: 1px solid #444;
+      padding: 10px 20px;
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
     }
-    button:hover { opacity: 0.8; }
-    .button-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    button:hover {
+      background: var(--accent);
+      border-color: var(--accent);
     }
-    .ai-button { background: #9c27b0; }
     #output {
-      background: var(--card);
+      background: #0d0d0d;
       padding: 18px;
       border-radius: 8px;
       white-space: pre-wrap;
       font-size: 14px;
-      line-height: 1.5;
-      min-height: 80px;
-      border: 1px solid #333;
+      line-height: 1.6;
+      min-height: 100px;
+      border: 1px solid #222;
+      color: #d1d1d1;
     }
     .success { color: var(--success); font-weight: bold; }
     .error { color: var(--error); font-weight: bold; }
@@ -97,14 +104,13 @@
     
     .loading {
       display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,.3);
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,.1);
       border-radius: 50%;
       border-top-color: var(--accent);
-      animation: spin 1s linear infinite;
-      margin-left: 8px;
-      vertical-align: middle;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -112,72 +118,57 @@
 <body>
 
   <header>
-    <h1>Codebot AI</h1>
-    <p class="subtitle">Secure Backend • Powered by Gemini Flash</p>
+    <h1>SYSTEM_CORE V3</h1>
+    <p class="subtitle">BACKEND_ENGINE • STATICAL_ANALYSIS_ACTIVE</p>
   </header>
 
   <div class="container">
     <select id="lang">
-      <option value="javascript">JavaScript</option>
-      <option value="python">Python</option>
-      <option value="java">Java</option>
-      <option value="cpp">C++</option>
-      <option value="go">Go</option>
+      <option value="javascript">JAVASCRIPT_RUNTIME</option>
+      <option value="python">PYTHON_INTERPRETER</option>
+      <option value="java">JAVA_VIRTUAL_MACHINE</option>
+      <option value="c">C_COMPILER</option>
+      <option value="cpp">CPP_STDLIB</option>
     </select>
     
-    <textarea id="code" placeholder="Paste your code here..."></textarea>
+    <textarea id="code" placeholder="[WAITING_FOR_INPUT] Incolla il codice sorgente qui..."></textarea>
 
     <div class="button-group">
-      <button class="ai-button" onclick="handleAction('Explain')">Explain Code</button>
-      <button class="ai-button" onclick="handleAction('Fix')">Check & Fix</button>
+      <button onclick="processRequest('Explain')">RUN_EXPLAIN</button>
+      <button onclick="processRequest('Fix')">RUN_FIX_OPTIMIZE</button>
     </div>
 
-    <div id="output">Results will appear here.</div>
+    <div id="output">MODULO_PRONTO: In attesa di istruzioni...</div>
   </div>
 
   <script>
-    /**
-     * Comunica con il proxy serverless di Vercel
-     */
-    async function callAIProxy(prompt, action, lang) {
-      const response = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: prompt, lang: lang, action: action })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.details || data.error || "Backend Error");
-      }
-
-      return data.response;
-    }
-
-    /**
-     * Gestisce le azioni dei pulsanti
-     */
-    async function handleAction(actionType) {
+    async function processRequest(action) {
       const code = document.getElementById('code').value.trim();
       const lang = document.getElementById('lang').value;
       const out = document.getElementById('output');
 
       if (!code) {
-        out.innerHTML = '<span class="error">⚠️ Please paste some code first.</span>';
+        out.innerHTML = '<span class="error">[SYSTEM_ERROR] INPUT_BUFFER_EMPTY</span>';
         return;
       }
 
-      out.innerHTML = `<span class="warning">Fetching results from backend...</span> <div class="loading"></div>`;
+      out.innerHTML = `<span class="warning">[PROCESS_START] Analisi in corso...</span> <div class="loading"></div>`;
 
       try {
-        const result = await callAIProxy(code, actionType, lang);
-        
-        const label = actionType === 'Explain' ? 'Explanation' : 'Analysis & Fix';
-        out.innerHTML = `<span class="success">✅ AI ${label}:</span>\n\n${result}`;
+        const response = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, lang, action })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "CONNECTION_LOST");
+
+        // Timestamp del server simulato per coerenza backend
+        const now = new Date().toLocaleTimeString();
+        out.innerHTML = `<span class="success">[REPORT_SUCCESS - ${now}]</span>\n\n${data.response}`;
       } catch (err) {
-        console.error(err);
-        out.innerHTML = `<span class="error">❌ Error: ${err.message}</span>\n<small style="color:#666">Check Vercel Logs for more details.</small>`;
+        out.innerHTML = `<span class="error">[CRITICAL_FAILURE] ${err.message}</span>`;
       }
     }
   </script>
