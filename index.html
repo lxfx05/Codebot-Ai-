@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Codebot Backend System</title>
-  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+  <title>Code-Fixer and Explainer</title>
+  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
   <style>
     :root {
       --bg: #121212;
@@ -118,13 +118,12 @@
 <body>
 
   <header>
-    <h1>SYSTEM_CORE V3</h1>
-    <p class="subtitle">Code-Fixer</p>
+    <h1>Code-Fixer and Explainer</h1>
   </header>
 
   <div class="container">
     <select id="lang">
-      <option value="javascript">Java</option>
+      <option value="javascript">JavaScript</option>
       <option value="python">Python</option>
       <option value="java">Java</option>
       <option value="c">C</option>
@@ -134,11 +133,11 @@
     <textarea id="code" placeholder="[WAITING_FOR_INPUT] Incolla il codice sorgente qui..."></textarea>
 
     <div class="button-group">
-      <button onclick="processRequest('Explain')">Load Backend</button>
-      <button onclick="processRequest('Fix')">Load Backend</button>
+      <button onclick="processRequest('Explain')">Analyze Code</button>
+      <button onclick="processRequest('Fix')">Fix & Optimize</button>
     </div>
 
-    <div id="output">Backend Caricato: In attesa di istruzioni...</div>
+    <div id="output">MODULO_PRONTO: In attesa di istruzioni...</div>
   </div>
 
   <script>
@@ -164,7 +163,6 @@
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "CONNECTION_LOST");
 
-        // Timestamp del server simulato per coerenza backend
         const now = new Date().toLocaleTimeString();
         out.innerHTML = `<span class="success">[REPORT_SUCCESS - ${now}]</span>\n\n${data.response}`;
       } catch (err) {
