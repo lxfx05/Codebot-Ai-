@@ -7,58 +7,40 @@ export default async function handler(req, res) {
 
     const { code, lang, action } = req.body || {};
     
+    // Recupera la chiave Groq da Vercel
+    const GROQ_KEY = process.env.GROQ_KEY;
 
-    const keys = [process.env.KEY1, process.env.KEY2, process.env.KEY3].filter(k => k);
-
-
-    const models = [
-        "gemini-3-flash",      
-        "gemini-3-pro",       
-        "gemini-2.0-flash",    
-        "gemini-1.5-pro",      
-        "gemini-1.5-flash"     
-    ];
-
-    if (keys.length === 0) {
-        return res.status(500).json({ error: "Nessuna chiave configurata (KEY_1, KEY_2, KEY_3)" });
+    if (!GROQ_KEY) {
+        return res.status(500).json({ error: "Manca la GROQ_KEY su Vercel." });
     }
 
-    let lastError = "";
+    try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-specdec", // Il modello più veloce e potente di Groq
+                messages: [
+                    { role: "system", content: `Sei un esperto programmatore ${lang}.` },
+                    { role: "user", content: `Azione: ${action}\nCodice:\n${code}` }
+                ],
+                temperature: 0.5
+            })
+        });
 
-    // GIRA TRA LE CHIAVI
-    for (const currentKey of keys) {
-        // GIRA TRA I MODELLI
-        for (const modelName of models) {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${currentKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: `Azione: ${action}. Linguaggio: ${lang}. Codice:\n${code}` }]
-                        }]
-                    })
-                });
+        const data = await response.json();
 
-                const data = await response.json();
-
-                if (response.ok && data.candidates?.[0]?.content) {
-                    return res.status(200).json({ 
-                        response: data.candidates[0].content.parts[0].text,
-                        info: `Key attiva: ${currentKey.substring(0, 6)}... | Modello: ${modelName}`
-                    });
-                } else {
-                    lastError = data.error?.message || "Errore sconosciuto";
-                    // Se il modello non è trovato o non supportato dalla chiave, prova il prossimo modello
-                    if (lastError.includes("not found") || lastError.includes("not supported")) continue;
-                    // Se è un errore di quota, passa alla prossima CHIAVE
-                    if (lastError.includes("quota")) break;
-                }
-            } catch (err) {
-                lastError = err.message;
-            }
+        if (data.error) {
+            return res.status(401).json({ error: "Errore Groq", details: data.error.message });
         }
-    }
 
-    res.status(500).json({ error: "Tutte le combinazioni fallite", details: lastError });
+        const aiText = data.choices[0]?.message?.content || "Nessuna risposta.";
+        res.status(200).json({ response: aiText });
+
+    } catch (err) {
+        res.status(500).json({ error: "Errore di rete", details: err.message });
+    }
 }
