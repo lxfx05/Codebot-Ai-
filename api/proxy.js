@@ -9,16 +9,10 @@ export default async function handler(req, res) {
     const GROQ_KEY = process.env.GROQ_KEY;
 
     if (!GROQ_KEY) {
-        return res.status(500).json({ error: "Manca la GROQ_KEY su Vercel." });
+        return res.status(500).json({ error: "System Error: Missing Backend Configuration." });
     }
 
-    // Lista modelli aggiornata al 2025
-    // Proviamo il versatile 3.3, il 3.1 stabile o il nuovo Llama 4 se disponibile
-    const models = [
-        "llama-3.3-70b-versatile", 
-        "llama-3.1-8b-instant"
-    ];
-
+    const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
     let lastError = "";
 
     for (const modelId of models) {
@@ -32,28 +26,41 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     model: modelId,
                     messages: [
-                        { role: "system", content: "Sei un esperto programmatore. Rispondi in modo conciso." },
-                        { role: "user", content: `Azione: ${action}\nLinguaggio: ${lang}\nCodice:\n${code}` }
-                    ]
+                        { 
+                            role: "system", 
+                            content: `Agisci come un motore di analisi statica del codice integrato nel backend. 
+                            NON salutare. NON dire 'Ecco il codice'. NON menzionare di essere un'IA o un modello linguistico. 
+                            Fornisci solo l'analisi tecnica o il codice corretto. 
+                            Usa un tono puramente tecnico e professionale.` 
+                        },
+                        { role: "user", content: `ENTRY_POINT: ${action}\nTARGET_LANG: ${lang}\nSOURCE_CODE:\n${code}` }
+                    ],
+                    temperature: 0.2 // Più basso per risposte più precise e meno "chiacchierone"
                 })
             });
 
             const data = await response.json();
 
             if (response.ok) {
+                let cleanResponse = data.choices[0].message.content;
+                
+                // Rimuove eventuali scorie residue che citano l'IA (sicurezza extra)
+                cleanResponse = cleanResponse.replace(/come un modello di linguaggio/gi, "")
+                                             .replace(/in quanto IA/gi, "")
+                                             .replace(/Ecco la spiegazione/gi, "");
+
                 return res.status(200).json({ 
-                    response: data.choices[0].message.content,
-                    info: `Modello usato: ${modelId}`
+                    response: cleanResponse 
                 });
             } else {
-                lastError = data.error?.message || "Errore sconosciuto";
+                lastError = data.error?.message || "Unknown internal error";
                 if (lastError.includes("decommissioned") || lastError.includes("not found")) continue;
-                break; // Se l'errore è altro (es. Key errata), fermati
+                break;
             }
         } catch (err) {
             lastError = err.message;
         }
     }
 
-    res.status(500).json({ error: "Errore Groq", details: lastError });
+    res.status(500).json({ error: "Backend Analysis Failed", details: lastError });
 }
