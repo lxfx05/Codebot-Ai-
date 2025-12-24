@@ -7,53 +7,58 @@ export default async function handler(req, res) {
 
     const { code, lang, action } = req.body || {};
     
-    // Recupero le chiavi dalle variabili d'ambiente di Vercel
-    const keys = [
-        process.env.KEY1,
-        process.env.KEY2,
-        process.env.KEY3
-    ].filter(k => k && k.trim() !== "");
+
+    const keys = [process.env.KEY1, process.env.KEY2, process.env.KEY3].filter(k => k);
+
+
+    const models = [
+        "gemini-3-flash",      
+        "gemini-3-pro",       
+        "gemini-2.0-flash",    
+        "gemini-1.5-pro",      
+        "gemini-1.5-flash"     
+    ];
 
     if (keys.length === 0) {
-        return res.status(500).json({ error: "Nessuna chiave API configurata su Vercel (KEY_1, KEY_2, KEY_3)." });
+        return res.status(500).json({ error: "Nessuna chiave configurata (KEY_1, KEY_2, KEY_3)" });
     }
 
     let lastError = "";
 
-    for (let i = 0; i < keys.length; i++) {
-        try {
-            // Usiamo v1 invece di v1beta per maggiore stabilità
-            const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${keys[i]}`;
-            
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `Agisci come assistente programmatore. Azione: ${action}. Linguaggio: ${lang}. Codice:\n${code}` }]
-                    }]
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.candidates && data.candidates[0].content) {
-                return res.status(200).json({ 
-                    response: data.candidates[0].content.parts[0].text,
-                    info: `Successo con Chiave ${i + 1}`
+    // GIRA TRA LE CHIAVI
+    for (const currentKey of keys) {
+        // GIRA TRA I MODELLI
+        for (const modelName of models) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${currentKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: `Azione: ${action}. Linguaggio: ${lang}. Codice:\n${code}` }]
+                        }]
+                    })
                 });
-            } else {
-                lastError = data.error?.message || "Risposta non valida dal modello";
-                console.warn(`Tentativo ${i + 1} fallito: ${lastError}`);
+
+                const data = await response.json();
+
+                if (response.ok && data.candidates?.[0]?.content) {
+                    return res.status(200).json({ 
+                        response: data.candidates[0].content.parts[0].text,
+                        info: `Key attiva: ${currentKey.substring(0, 6)}... | Modello: ${modelName}`
+                    });
+                } else {
+                    lastError = data.error?.message || "Errore sconosciuto";
+                    // Se il modello non è trovato o non supportato dalla chiave, prova il prossimo modello
+                    if (lastError.includes("not found") || lastError.includes("not supported")) continue;
+                    // Se è un errore di quota, passa alla prossima CHIAVE
+                    if (lastError.includes("quota")) break;
+                }
+            } catch (err) {
+                lastError = err.message;
             }
-        } catch (err) {
-            lastError = err.message;
-            console.error(`Errore tecnico chiave ${i + 1}:`, err);
         }
     }
 
-    res.status(500).json({ 
-        error: "Non è stato possibile ottenere una risposta dalle API di Google.", 
-        details: lastError 
-    });
+    res.status(500).json({ error: "Tutte le combinazioni fallite", details: lastError });
 }
