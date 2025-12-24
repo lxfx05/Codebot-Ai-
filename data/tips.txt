@@ -1,0 +1,16 @@
+[Debug] "First, solve the problem. Then, write the code." - John Johnson
+[Programming] "Code is like humor. If you have to explain it, it's bad." - Cory House
+[Logic] "Don't try to solve a problem while you are in the middle of it." - Anon
+[AI] "Don't build a system that thinks for you. Build a tool that helps you think better." - Luke
+[Python] "Indentation is part of the syntax. Use 4 spaces for each block."
+[JavaScript] "Use '===' instead of '==' for safe comparisons."
+[C++] "Every statement ends with ';'. Forgetting it causes compilation errors."
+[General] "Write code as if the person who maintains it is a psychopathic maniac who knows your address."
+[General] "The best error message is the one that never shows up."
+[Java] "Class names should start with an uppercase letter."
+[Go] "Use 'go fmt' to format your code consistently."
+[General] "Always initialize variables before using them."
+[General] "Comment your code, but not the obvious parts."
+[Debug] "The most effective debugging tool is still careful thought, coupled with judiciously placed print statements." - Brian Kernighan
+[General] "Premature optimization is the root of all evil." - Donald Knuth
+[General] "Make it work, make it right, make it fast - in that order." - Kent Beck

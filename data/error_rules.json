@@ -1,0 +1,62 @@
+{
+  "javascript": [
+    {
+      "pattern": "missing ) after argument list",
+      "explanation": "Missing closing parenthesis ')' after the function arguments.",
+      "fix": "Add ')' after the argument list."
+    },
+    {
+      "pattern": "Unexpected token '}'",
+      "explanation": "You have an extra closing brace '}' or a missing opening brace '{'.",
+      "fix": "Check that all '{' have a corresponding '}'."
+    }
+  ],
+  "python": [
+    {
+      "pattern": "unexpected indent",
+      "explanation": "Python indentation error. Check spaces at the beginning of the line.",
+      "fix": "Ensure indentation is consistent (usually 4 spaces per block)."
+    },
+    {
+      "pattern": "invalid syntax",
+      "explanation": "General syntax error. Check parentheses, commas, colons, etc.",
+      "fix": "Review the line indicated and verify the syntax."
+    }
+  ],
+  "java": [
+    {
+      "pattern": "class, interface, or enum expected",
+      "explanation": "Every source file must contain at least one top-level class, interface, or enum.",
+      "fix": "Make sure the code is inside a 'public class ClassName { ... }' declaration."
+    },
+    {
+      "pattern": "';' expected",
+      "explanation": "In Java, many statements must end with a semicolon.",
+      "fix": "Check the end of the indicated line and add ';' if missing."
+    }
+  ],
+  "cpp": [
+    {
+      "pattern": "expected ';' at end of declaration",
+      "explanation": "In C++, every declaration must end with a semicolon.",
+      "fix": "Add ';' at the end of the line."
+    },
+    {
+      "pattern": "expected '}'",
+      "explanation": "A closing brace is missing.",
+      "fix": "Check that all '{' have a corresponding '}'."
+    }
+  ],
+  "go": [
+    {
+      "pattern": "expected 'package'",
+      "explanation": "Every Go source file must start with a 'package' declaration.",
+      "fix": "Add 'package main' or another package name at the top of the file."
+    },
+    {
+      "pattern": "undefined: ",
+      "explanation": "A variable or function name is not recognized.",
+      "fix": "Check the spelling or make sure the variable/function is declared before being used."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "javascript": {
+    "function": "A function is a reusable block of code that performs a specific action.",
+    "for loop": "A 'for' loop repeats a block of code a specific number of times.",
+    "if statement": "An 'if' statement executes a block of code only if a condition is true."
+  },
+  "python": {
+    "def": "The 'def' keyword defines a new function.",
+    "list": "A list is an ordered, mutable collection of elements.",
+    "for loop": "The 'for' loop in Python iterates over sequences like lists, strings, or ranges."
+  },
+  "java": {
+    "public class": "A class in Java is a template for creating objects. 'public' makes the class visible everywhere.",
+    "public static void main": "The 'main' method is the entry point of every Java program.",
+    "import": "The 'import' keyword allows using classes from other packages."
+  },
+  "cpp": {
+    "int main": "The 'main' function is the entry point of every C++ program.",
+    "include": "The '#include' directive is used to include header files.",
+    "semicolon": "In C++, every statement must end with a semicolon ';'."
+  },
+  "go": {
+    "package main": "Every Go program must have a 'main' package to be executable.",
+    "func main": "The 'main' function is the entry point of every Go program.",
+    "import": "The 'import' keyword is used to include other packages in your code."
+  }
+}
