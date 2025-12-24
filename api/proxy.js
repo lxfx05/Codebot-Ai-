@@ -9,9 +9,9 @@ export default async function handler(req, res) {
     
     // Lista delle chiavi caricate da Vercel
     const keys = [
-        process.env.KEY_1,
-        process.env.KEY_2,
-        process.env.KEY_3
+        process.env.KEY1,
+        process.env.KEY2,
+        process.env.KEY3
     ].filter(k => k); // Rimuove chiavi vuote o non impostate
 
     if (keys.length === 0) {
