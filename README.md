@@ -24,7 +24,7 @@ Codebot-Ai is an advanced assistant designed to bridge the gap between complex a
 
 **Code Generation Example**
 
-\`\`\`python
+```python
 # User Request: Create a secure login logic in FastAPI
 # Codebot-Ai Output:
 from fastapi import FastAPI, Depends, HTTPException
@@ -36,7 +36,7 @@ app = FastAPI()
 async def login(data: UserLogin):
     # Logic for secure authentication
     return {"status": "access_granted"}
-\`\`\`
+```
 
 ---
 
