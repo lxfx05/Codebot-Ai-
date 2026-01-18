@@ -1,69 +1,73 @@
-# 🤖 Codebot - Your Offline Code Assistant
+<div align="center">
 
+# 🤖 **Codebot-Ai**
+### *The Next-Generation AI Coding Assistant*
 
+<br />
 
-**Codebot** is a powerful **100% in-browser** development tool designed to help programmers clean, explain, and fix their code snippets quickly and privately.
+![AI-Powered](https://img.shields.io/badge/ENGINE-AI--DRIVEN-8A2BE2?style=for-the-badge&logo=openai&logoColor=white)
+![Automation](https://img.shields.io/badge/PROCESS-AUTOMATED-white?style=for-the-badge)
+![Status](https://img.shields.io/badge/VERSION-STABLE-success?style=for-the-badge)
 
-Unlike cloud-based assistants, Codebot operates completely **offline**, ensuring your code never leaves your browser.
+<br />
 
-## 🌟 Key Features
-
-* **Zero AI, 100% Privacy:** No external API calls. All code analysis is performed locally, guaranteeing maximum confidentiality.
-* **Instant Assistance:** The ideal tool for fast debugging and immediate code comprehension.
-* **Multi-Language Support:** Analyzes code in several popular programming languages.
-* **Currently supports up to 100 lines of code** (with plans for future expansion!).
-
-## ✨ Functionality
-
-Codebot offers two main actions accessible via a simple and intuitive interface:
-
-| Button | Description | Purpose |
-| :--- | :--- | :--- |
-| **Check & Fix** | Analyzes the entered code, locates common syntax and logic errors, explains where the error is, and attempts to fix it. | Quick debugging and snippet correction. |
-| **Explain Code** | Provides a structured, step-by-step explanation of how the code works. | Rapid understanding of logic and flow. |
-
-## 💻 Supported Languages
-
-Codebot currently supports the analysis of the following languages:
-
-* JavaScript
-* React (JSX)
-* Python
-* Java
-* C++
-* Go
-
-*(We are working to expand this list and improve the depth of analysis for each language.)*
-
-## 🚀 Try Codebot
-
-Check out the live demo and try the tool right now:
-
-[https://lxfx05.github.io/Codebot-Ai-/](https://lxfx05.github.io/Codebot-Ai-/)
-
-## 🛠️ Architecture and Technology
-
-Codebot is built with a focus on performance and local execution.
-
-* **Front-end:** [Add your front-end stack here, e.g., HTML/CSS/Vanilla JS / React]
-* **Static Analysis:** [Briefly explain how you handle the analysis *without* AI, e.g., "It utilizes language-specific code parsing libraries executed via WebAssembly."]
-* **Core Libraries:** [Add key libraries like CodeMirror/Monaco Editor, linters, parsers used]
-
-## 💡 Contributions and Roadmap
-
-The Codebot project is under active development. Here are some of our next goals:
-
-1.  **Limit Increase:** Surpassing the 100-line code limit.
-2.  **Optimization:** Adding a "Suggest Optimization" feature to improve efficiency.
-3.  **Wasm Integration:** Implementing WebAssembly for more powerful and faster analysis.
-
-If you are interested in contributing, feel free to open an Issue or submit a Pull Request!
-
-## 📧 Contact
-
-Do you have questions or suggestions? Get in touch!
-
-* **GitHub:** [@lxfx05](https://github.com/lxfx05)
+**"Supercharge your development workflow with AI-driven logic and real-time code optimization."**
 
 ---
-*Codebot: Write, fix, learn. All in your browser.*
+
+</div>
+
+### 🚀 **Project Overview**
+Codebot-Ai is an advanced assistant designed to bridge the gap between complex architectural ideas and clean, executable code. It analyzes requirements and generates high-quality, documented solutions across multiple stacks.
+
+### 🛠️ **How it works**
+
+**Code Generation Example**
+
+\`\`\`python
+# User Request: Create a secure login logic in FastAPI
+# Codebot-Ai Output:
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+
+app = FastAPI()
+
+@app.post("/login")
+async def login(data: UserLogin):
+    # Logic for secure authentication
+    return {"status": "access_granted"}
+\`\`\`
+
+---
+
+### 🧰 **Tech Stack**
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=py,js,supabase,docker,linux,vscode,github,replit&theme=dark" />
+  </a>
+</p>
+
+### 💎 **Key Capabilities**
+* **Instant Logic Drafting:** Turn thoughts into structured code in seconds. ⚡
+* **Architecture Modeling:** Helps you design the backbone of your apps. 🏗️
+* **Bug Detection:** Scans your logic to find and fix vulnerabilities. 🛡️
+* **Cross-Stack Support:** Fluent in Python, JavaScript, Bash, and more. 🌍
+
+---
+
+<div align="center">
+
+### 🤝 **Collaborate with Me**
+*Looking for custom AI integrations or system optimization?*
+
+<a href="mailto:lucafinaldi3@gmail.com"><img src="https://img.shields.io/badge/Email_Me-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+<a href="https://lxfx05.github.io/Website/"><img src="https://img.shields.io/badge/My_Portfolio-3b82f6?style=for-the-badge&logo=google-chrome&logoColor=white" /></a>
+
+<br />
+
+<img src="https://readme-typing-svg.herokuapp.com?font=Space+Grotesk&size=24&duration=2000&pause=1000&center=true&vCenter=true&width=650&color=8A2BE2&lines=AI+INTELLIGENCE;CODE+AUTOMATION;FUTURE+OF+DEVELOPMENT" />
+
+</div>
+
+---
+*Developed with vision by [Luca Finaldi](https://lxfx05.github.io/Website/)* 🏳️‍🌈
