@@ -70,4 +70,4 @@ async def login(data: UserLogin):
 </div>
 
 ---
-*Developed with vision by [Luca Finaldi](https://lxfx05.github.io/Website/)* 🏳️‍🌈
+*Developed with vision by [Luca Finaldi](https://lxfx05.github.io/Website/)* 
